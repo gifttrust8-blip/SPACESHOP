@@ -1,0 +1,28 @@
+"use client"
+import { useState } from "react";
+
+export default function AdminPage() {
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await res.json();
+    setImageUrl(data.url);
+    setUploading(false);
+  }
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Admin - Upload Product Image</h1>
+      <input type="file" accept="image/*" onChange={handleUpload} />
+      {uploading && <p>Uploading...</p>}
+      {imageUrl && <img src={imageUrl} alt="preview" style={{ width: 200, marginTop: 10 }} />}
+    </div>
+  );
+}
